@@ -1,0 +1,19 @@
+log:
+  Level: info
+
+# base config for convert
+convert:
+  source: "/etc/openclash/rule_provider"
+  target: "/etc/mosdns/from_provider"
+  processFiles: 
+    - "ai.txt"
+    - "apple.yaml"
+    - "direct.yaml"
+    - "gfw.yaml"
+    - "icloud.yaml"
+    - "proxy.yaml"
+
+# run background to watch the file change
+service:
+  enable: True
+  dbFile: "/etc/mosdns/provider2domainset.db"
