@@ -1,0 +1,5 @@
+265.com
++.google.com
+git.*.com
+*.baidu.com
+.163.com
