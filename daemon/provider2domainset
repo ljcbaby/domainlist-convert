@@ -1,0 +1,16 @@
+#!/bin/sh /etc/rc.common
+
+USE_PROCD=1
+START=99
+STOP=10
+
+P2D_CONF="/etc/provider2domainset.yaml"
+
+start_service() {
+    procd_open_instance
+    procd_set_param command provider2domainset service -c $P2D_CONF
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_set_param respawn
+    procd_close_instance
+}

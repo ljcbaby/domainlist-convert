@@ -84,7 +84,7 @@ def go_build():
         logger.info(f'building {zip_filename}')
         try:
             subprocess.check_call(
-                f'go build -ldflags "-s -w -X main.version={VERSION}" -trimpath -o {bin_filename} ../', shell=True,
+                f'go build -ldflags "-s -w -X cmd.version={VERSION}" -trimpath -o {bin_filename} ../', shell=True,
                 env=os_env)
 
             if args.upx:
@@ -97,9 +97,6 @@ def go_build():
             with zipfile.ZipFile(zip_filename, mode='w', compression=zipfile.ZIP_DEFLATED,
                                  compresslevel=5) as zf:
                 zf.write(bin_filename)
-                zf.write('../README.md', 'README.md')
-                zf.write('./config.yaml', 'config.yaml')
-                zf.write('../LICENSE', 'LICENSE')
 
         except subprocess.CalledProcessError as e:
             logger.error(f'build {zip_filename} failed: {e.args}')
