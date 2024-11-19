@@ -5,7 +5,7 @@ log:
 convert:
   source: "/etc/openclash/rule_provider"
   target: "/etc/mosdns/from_provider"
-  processFiles: 
+  processFiles:
     - "ai.txt"
     - "apple.yaml"
     - "direct.yaml"
@@ -16,4 +16,5 @@ convert:
 # run background to watch the file change
 service:
   enable: True
+  delay: 60
   dbFile: "/etc/mosdns/provider2domainset.db"

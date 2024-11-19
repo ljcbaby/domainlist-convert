@@ -20,6 +20,7 @@ var Convert struct {
 
 var Service struct {
 	Enable bool
+	Delay  int
 	DbFile string
 }
 
@@ -57,6 +58,7 @@ func update() {
 	Convert.ProcessFiles = viper.GetStringSlice("convert.process_files")
 
 	Service.Enable = viper.GetBool("service.enable")
+	Service.Delay = viper.GetInt("service.delay")
 	Service.DbFile = viper.GetString("service.db_file")
 
 	if level, err := zapcore.ParseLevel(viper.GetString("log.level")); err == nil {
