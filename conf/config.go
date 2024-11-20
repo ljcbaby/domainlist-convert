@@ -15,7 +15,7 @@ var configSample []byte
 var Convert struct {
 	Source       string
 	Target       string
-	ProcessFiles []string
+	ProcessFiles []*File
 }
 
 var Service struct {
@@ -55,7 +55,14 @@ func Init(file string) {
 func update() {
 	Convert.Source = viper.GetString("convert.source")
 	Convert.Target = viper.GetString("convert.target")
-	Convert.ProcessFiles = viper.GetStringSlice("convert.process_files")
+	Convert.ProcessFiles = make([]*File, 0)
+	for _, file := range viper.GetStringMap("convert.files") {
+		f := file.(map[string]interface{})
+		Convert.ProcessFiles = append(Convert.ProcessFiles, &File{
+			Name: f["name"].(string),
+			Type: f["type"].(string),
+		})
+	}
 
 	Service.Enable = viper.GetBool("service.enable")
 	Service.Delay = viper.GetInt("service.delay")

@@ -6,12 +6,18 @@ convert:
   source: "/etc/openclash/rule_provider"
   target: "/etc/mosdns/from_provider"
   processFiles:
-    - "ai.txt"
-    - "apple.yaml"
-    - "direct.yaml"
-    - "gfw.yaml"
-    - "icloud.yaml"
-    - "proxy.yaml"
+    - name: "ai.txt"
+      type: "classical"
+    - name: "apple.yaml"
+      type: "domain"
+    - name: "direct.yaml"
+      type: "domain"
+    - name: "gfw.yaml"
+      type: "domain"
+    - name: "icloud.yaml"
+      type: "domain"
+    - name: "proxy.yaml"
+      type: "domain"
 
 # run background to watch the file change
 service:

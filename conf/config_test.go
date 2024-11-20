@@ -1,7 +1,11 @@
-package conf
+package conf_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/dn-11/provider2domainset/conf"
+)
 
 func TestParseConfig(t *testing.T) {
-	Init("config-sample.yaml")
+	conf.Init("config-sample.yaml")
 }

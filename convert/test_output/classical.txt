@@ -1,0 +1,4 @@
+DOMAIN,ai.google.dev
+DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
+DOMAIN-KEYWORD,openai
+DOMAIN-REGEX,^abc.*com
