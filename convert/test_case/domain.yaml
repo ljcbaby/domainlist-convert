@@ -6,3 +6,7 @@ payload:
   - 'git.*.com'
   - '*.baidu.com'
   - '.163.com'
+  - '*.*.google.com'
+  - '.abc.*.com'
+  - '+.exp.*.baidu.com'
+  - '*'

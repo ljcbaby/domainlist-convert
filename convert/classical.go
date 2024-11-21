@@ -44,7 +44,7 @@ func convertClassical(s *os.File, t *os.File) error {
 			res = "keyword:" + args[1]
 		case "DOMAIN-REGEX":
 			if conf.Convert.EnableRegex {
-				res = "regex:" + args[1]
+				res = "regexp:" + args[1]
 			} else {
 				log.L().Sugar().Warnf("regex is disabled: %s", line)
 				continue

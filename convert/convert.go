@@ -35,8 +35,11 @@ func Convert(t Task) error {
 		if err != nil {
 			return errors.Wrap(err, "convert classical failed")
 		}
-	// case conf.TypeDomain:
-	// 	err = convertDomain(source, target)
+	case conf.TypeDomain:
+		err = convertDomain(source, target)
+		if err != nil {
+			return errors.Wrap(err, "convert domain failed")
+		}
 	default:
 		return errors.New("unknown convert type")
 	}
