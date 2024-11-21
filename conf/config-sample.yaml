@@ -18,6 +18,7 @@ convert:
       type: "domain"
     - name: "proxy.yaml"
       type: "domain"
+  enableRegex: True
 
 # run background to watch the file change
 service:

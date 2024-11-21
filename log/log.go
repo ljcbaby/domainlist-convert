@@ -5,16 +5,22 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var (
-	Logger      *zap.Logger
-	atomicLevel zap.AtomicLevel
-)
+var l *Logger = nil
 
-func Init() {
-	atomicLevel = zap.NewAtomicLevel()
+func L() *Logger {
+	if l == nil {
+		l, _ = Init()
+	}
+	return l
+}
+
+func Init() (*Logger, error) {
+	l := Logger{}
+
+	l.Level = zap.NewAtomicLevel()
 
 	config := zap.Config{
-		Level:       atomicLevel,
+		Level:       l.Level,
 		Development: true,
 		Encoding:    "console",
 		EncoderConfig: zapcore.EncoderConfig{
@@ -34,13 +40,11 @@ func Init() {
 	}
 
 	var err error
-	Logger, err = config.Build()
-	SetLogLevel(zapcore.InfoLevel)
+	l.Logger, err = config.Build()
+	l.SetLogLevel(zapcore.InfoLevel)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-}
 
-func SetLogLevel(level zapcore.Level) {
-	atomicLevel.SetLevel(level)
+	return &l, nil
 }

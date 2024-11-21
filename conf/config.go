@@ -16,6 +16,7 @@ var Convert struct {
 	Source       string
 	Target       string
 	ProcessFiles []*File
+	EnableRegex  bool
 }
 
 var Service struct {
@@ -31,15 +32,15 @@ var Log struct {
 func Init(file string) {
 	if _, err := os.Stat(file); err != nil {
 		if !os.IsNotExist(err) {
-			log.Logger.Sugar().With(err).Errorf("get stat of %s failed", file)
+			log.L().Sugar().With(err).Errorf("get stat of %s failed", file)
 		}
-		log.Logger.Sugar().Infof("config not existed, creating at %s", file)
+		log.L().Sugar().Infof("config not existed, creating at %s", file)
 		created, err := os.Create(file)
 		if err != nil {
-			log.Logger.Sugar().With(err).Errorf("create config at %s failed", file)
+			log.L().Sugar().With(err).Errorf("create config at %s failed", file)
 		}
 		if _, err := created.Write(configSample); err != nil {
-			log.Logger.Sugar().With(err).Errorf("write config at %s failed", file)
+			log.L().Sugar().With(err).Errorf("write config at %s failed", file)
 		}
 	}
 
@@ -48,7 +49,7 @@ func Init(file string) {
 
 	update()
 	if err != nil {
-		log.Logger.Sugar().With(err).Errorf("read config from %s failed", file)
+		log.L().Sugar().With(err).Errorf("read config from %s failed", file)
 	}
 }
 
@@ -63,6 +64,7 @@ func update() {
 			Type: f["type"].(string),
 		})
 	}
+	Convert.EnableRegex = viper.GetBool("convert.enable_regex")
 
 	Service.Enable = viper.GetBool("service.enable")
 	Service.Delay = viper.GetInt("service.delay")

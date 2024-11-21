@@ -31,7 +31,7 @@ func init() {
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		verbose, _ := cmd.Flags().GetBool("verbose")
 		if verbose {
-			log.SetLogLevel(zapcore.DebugLevel)
+			log.L().SetLogLevel(zapcore.DebugLevel)
 		}
 	}
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

@@ -20,26 +20,26 @@ func AddService() {
 	_, err := exec.LookPath("provider2domainset")
 	if err != nil {
 		if !errors.Is(err, exec.ErrDot) {
-			log.Logger.Error("fetch current binary path failed", zap.Error(err))
+			log.L().Error("fetch current binary path failed", zap.Error(err))
 		}
-		log.Logger.Warn("provider2domainset hasn't been installed to path, let's turn to install it")
+		log.L().Warn("provider2domainset hasn't been installed to path, let's turn to install it")
 		Install()
 	}
 	if _, err := os.Stat(ServicePath); err == nil {
 		err := os.Remove(ServicePath)
 		if err != nil {
-			log.Logger.Sugar().Warnf("remove %s failed", ServicePath)
+			log.L().Sugar().Warnf("remove %s failed", ServicePath)
 		}
 	}
 	file, err := os.OpenFile(ServicePath, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
-		log.Logger.Sugar().With(err).Fatalf("open %s failed", ServicePath)
+		log.L().Sugar().With(err).Fatalf("open %s failed", ServicePath)
 	}
 	defer file.Close()
 	if _, err := file.Write(ServiceFile); err != nil {
-		log.Logger.Sugar().With(err).Fatalf("write %s failed", ServicePath)
+		log.L().Sugar().With(err).Fatalf("write %s failed", ServicePath)
 	}
-	log.Logger.Info("add provider2domainset to init.d success")
+	log.L().Info("add provider2domainset to init.d success")
 }
 
 func RmService() {
@@ -48,6 +48,6 @@ func RmService() {
 		if os.IsNotExist(err) {
 			return
 		}
-		log.Logger.Error("delete service failed", zap.Error(err))
+		log.L().Error("delete service failed", zap.Error(err))
 	}
 }

@@ -25,3 +25,6 @@ vendor/
 
 # Dependency directories
 Godeps/
+
+# Test output
+convert/test_output/

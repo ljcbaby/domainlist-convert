@@ -17,60 +17,60 @@ const installed = "/usr/sbin/provider2domainset"
 func Install() {
 	file, err := exec.LookPath(os.Args[0])
 	if err != nil && !errors.Is(err, exec.ErrDot) {
-		log.Logger.Error("fetch current binary path failed", zap.Error(err))
+		log.L().Error("fetch current binary path failed", zap.Error(err))
 		return
 	}
 
 	absFile, err := filepath.Abs(file)
 	if err != nil {
-		log.Logger.Error("The absPath failed", zap.Error(err))
+		log.L().Error("The absPath failed", zap.Error(err))
 		return
 	}
-	log.Logger.Sugar().Infof("current binary: %v", absFile)
+	log.L().Sugar().Infof("current binary: %v", absFile)
 
 	originFp, err := os.Open(absFile)
 	if err != nil {
-		log.Logger.Error("open current binary failed", zap.Error(err))
+		log.L().Error("open current binary failed", zap.Error(err))
 		return
 	}
 	defer originFp.Close()
 
 	if _, err := os.Stat(installed); err != nil {
 		if !os.IsNotExist(err) {
-			log.Logger.Error("fetch binary stat failed", zap.Error(err))
+			log.L().Error("fetch binary stat failed", zap.Error(err))
 			return
 		}
 	} else {
 		if err := os.RemoveAll(installed); err != nil {
-			log.Logger.Error("remove old binary failed", zap.Error(err))
+			log.L().Error("remove old binary failed", zap.Error(err))
 			return
 		}
 	}
 
 	fp, err := os.OpenFile(installed, os.O_CREATE|os.O_RDWR, os.ModePerm)
 	if err != nil {
-		log.Logger.Sugar().Errorf("write to %v", installed)
+		log.L().Sugar().Errorf("write to %v", installed)
 		return
 	}
 	defer fp.Close()
 	_, err = io.Copy(fp, originFp)
 	if err != nil {
 		_ = os.RemoveAll(installed)
-		log.Logger.Sugar().With(err).Errorf("copy binary to %s", installed)
+		log.L().Sugar().With(err).Errorf("copy binary to %s", installed)
 		return
 	}
-	log.Logger.Info("installed provider2domainset")
+	log.L().Info("installed provider2domainset")
 }
 
 func Uninstall() {
 	file, err := exec.LookPath("provider2domainset")
 	if err != nil {
-		log.Logger.Error("find provider2domainset failed", zap.Error(err))
+		log.L().Error("find provider2domainset failed", zap.Error(err))
 		return
 	}
 
 	if err := os.RemoveAll(file); err != nil {
-		log.Logger.Error("remove binary failed", zap.Error(err), zap.String("path", file))
+		log.L().Error("remove binary failed", zap.Error(err), zap.String("path", file))
 		return
 	}
 }
