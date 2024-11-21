@@ -4,14 +4,19 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/dn-11/provider2domainset/conf"
+	"github.com/dn-11/provider2domainset/log"
 	"github.com/pkg/errors"
 )
 
 func Convert(t Task) error {
-	source, err := os.ReadFile(filepath.Join(t.Source, t.Name))
+	log.L().Sugar().Infof("convert %s of %s", t.Name, t.Type)
+
+	source, err := os.Open(filepath.Join(t.Source, t.Name))
 	if err != nil {
 		return errors.Wrap(err, "read source file failed")
 	}
+	defer source.Close()
 
 	err = os.MkdirAll(t.Target, os.ModePerm)
 	if err != nil {
@@ -22,10 +27,18 @@ func Convert(t Task) error {
 	if err != nil {
 		return errors.Wrap(err, "create target file failed")
 	}
+	defer target.Close()
 
-	_, err = target.Write(source)
-	if err != nil {
-		return errors.Wrap(err, "write target file failed")
+	switch t.Type {
+	case conf.TypeClassical:
+		err = convertClassical(source, target)
+		if err != nil {
+			return errors.Wrap(err, "convert classical failed")
+		}
+	// case conf.TypeDomain:
+	// 	err = convertDomain(source, target)
+	default:
+		return errors.New("unknown convert type")
 	}
 
 	return nil

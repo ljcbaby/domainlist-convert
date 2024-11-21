@@ -35,8 +35,9 @@ func Init() (*Logger, error) {
 			EncodeTime:    zapcore.ISO8601TimeEncoder,
 			EncodeCaller:  zapcore.ShortCallerEncoder,
 		},
-		OutputPaths:      []string{"stdout"},
-		ErrorOutputPaths: []string{"stderr"},
+		OutputPaths:       []string{"stdout"},
+		ErrorOutputPaths:  []string{"stderr"},
+		DisableStacktrace: true,
 	}
 
 	var err error
