@@ -33,7 +33,7 @@ func Init(file string) {
 		if !os.IsNotExist(err) {
 			log.L().Sugar().With(err).Errorf("get stat of %s failed", file)
 		}
-		log.L().Sugar().Fatalf("config not existed, creating at %s", file)
+		log.L().Sugar().Errorf("config not existed, creating at %s", file)
 		created, err := os.Create(file)
 		if err != nil {
 			log.L().Sugar().With(err).Errorf("create config at %s failed", file)
@@ -41,6 +41,7 @@ func Init(file string) {
 		if _, err := created.Write(configSample); err != nil {
 			log.L().Sugar().With(err).Errorf("write config at %s failed", file)
 		}
+		log.L().Fatal("config created, please edit it.")
 	}
 
 	viper.SetConfigFile(file)
@@ -90,6 +91,9 @@ func update() {
 	Service.Delay = viper.GetInt("service.delay")
 
 	if level, err := zapcore.ParseLevel(viper.GetString("log.level")); err == nil {
-		Log.Level = level
+		if log.L().Level.Level() == zapcore.InfoLevel {
+			Log.Level = level
+			log.L().SetLogLevel(level)
+		}
 	}
 }
