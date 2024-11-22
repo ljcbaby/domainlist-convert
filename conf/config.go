@@ -15,7 +15,7 @@ var configSample []byte
 var Convert struct {
 	Source       string
 	Target       string
-	ProcessFiles []*File
+	ProcessFiles []File
 	EnableRegex  bool
 }
 
@@ -62,10 +62,10 @@ func update() {
 		log.L().Sugar().Fatal("source or target is empty")
 	}
 
-	Convert.ProcessFiles = make([]*File, 0)
+	Convert.ProcessFiles = make([]File, 0)
 	for _, file := range viper.Get("convert.processFiles").([]interface{}) {
 		t := file.(map[string]interface{})
-		f := &File{
+		f := File{
 			Name: t["name"].(string),
 			Type: t["type"].(string),
 		}
