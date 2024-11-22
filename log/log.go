@@ -1,20 +1,25 @@
 package log
 
 import (
+	"sync"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var l *Logger = nil
+var (
+	l  *Logger = Init()
+	mu sync.RWMutex
+)
 
 func L() *Logger {
-	if l == nil {
-		l, _ = Init()
-	}
-	return l
+	mu.RLock()
+	t := l
+	mu.RUnlock()
+	return t
 }
 
-func Init() (*Logger, error) {
+func Init() *Logger {
 	l := Logger{}
 
 	l.Level = zap.NewAtomicLevel()
@@ -42,10 +47,10 @@ func Init() (*Logger, error) {
 
 	var err error
 	l.Logger, err = config.Build()
-	l.SetLogLevel(zapcore.InfoLevel)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
+	l.SetLogLevel(zapcore.InfoLevel)
 
-	return &l, nil
+	return &l
 }

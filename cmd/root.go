@@ -34,5 +34,4 @@ func init() {
 			log.L().SetLogLevel(zapcore.DebugLevel)
 		}
 	}
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

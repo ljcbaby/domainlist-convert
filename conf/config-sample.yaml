@@ -24,4 +24,3 @@ convert:
 service:
   enable: True
   delay: 60
-  dbFile: "/etc/mosdns/provider2domainset.db"
