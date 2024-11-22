@@ -63,20 +63,21 @@ func update() {
 	}
 
 	Convert.ProcessFiles = make([]*File, 0)
-	for _, file := range viper.GetStringMap("convert.files") {
-		f := file.(map[string]interface{})
+	for _, file := range viper.Get("convert.processFiles").([]interface{}) {
+		t := file.(map[string]interface{})
+		f := &File{
+			Name: t["name"].(string),
+			Type: t["type"].(string),
+		}
 
-		switch f["type"].(string) {
+		switch f.Type {
 		case TypeClassical, TypeDomain:
 		default:
-			log.L().Sugar().Fatalf("%s unknown type, skip it: %s", f["name"], f["type"])
+			log.L().Sugar().Fatalf("%s unknown type, skip it: %s", f.Type, f.Name)
 			continue
 		}
 
-		Convert.ProcessFiles = append(Convert.ProcessFiles, &File{
-			Name: f["name"].(string),
-			Type: f["type"].(string),
-		})
+		Convert.ProcessFiles = append(Convert.ProcessFiles, f)
 	}
 
 	if len(Convert.ProcessFiles) == 0 {
