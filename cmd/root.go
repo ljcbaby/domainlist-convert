@@ -8,6 +8,10 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+var (
+	config string
+)
+
 var rootCmd = &cobra.Command{
 	Use:   "provider2domainset",
 	Short: "p2d, convert domain list form clash provider to mosdns domainset.",

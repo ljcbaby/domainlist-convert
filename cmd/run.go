@@ -6,9 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	config string
-)
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run convert once",
