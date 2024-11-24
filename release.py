@@ -63,11 +63,11 @@ def go_build():
     except subprocess.CalledProcessError as e:
         logger.error(f'get git tag failed: {e.args}')
 
-    try:
-        subprocess.check_call('go run ../ config gen config.yaml', shell=True, env=os.environ)
-    except Exception:
-        logger.exception('failed to generate config template')
-        raise
+    # try:
+    #     subprocess.check_call('go run ../ config gen config.yaml', shell=True, env=os.environ)
+    # except Exception:
+    #     logger.exception('failed to generate config template')
+    #     raise
 
     for env in envs:
         os_env = os.environ.copy()  # new env
