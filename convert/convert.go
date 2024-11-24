@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dn-11/provider2domainset/conf"
-	"github.com/dn-11/provider2domainset/log"
+	"github.com/ljcbaby/domainlist-convert/conf"
+	"github.com/ljcbaby/domainlist-convert/log"
 	"github.com/pkg/errors"
 )
 

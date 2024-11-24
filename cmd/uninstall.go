@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/dn-11/provider2domainset/daemon"
+	"github.com/ljcbaby/domainlist-convert/daemon"
 
 	"github.com/spf13/cobra"
 )

@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/dn-11/provider2domainset/conf"
-	"github.com/dn-11/provider2domainset/convert"
+	"github.com/ljcbaby/domainlist-convert/conf"
+	"github.com/ljcbaby/domainlist-convert/convert"
 	"github.com/spf13/cobra"
 )
 

@@ -1,4 +1,4 @@
-module github.com/dn-11/provider2domainset
+module github.com/ljcbaby/domainlist-convert
 
 go 1.23
 

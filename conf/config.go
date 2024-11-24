@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"os"
 
-	"github.com/dn-11/provider2domainset/log"
+	"github.com/ljcbaby/domainlist-convert/log"
 	"github.com/spf13/viper"
 	"go.uber.org/zap/zapcore"
 )

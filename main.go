@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/dn-11/provider2domainset/cmd"
-	"github.com/dn-11/provider2domainset/log"
+	"github.com/ljcbaby/domainlist-convert/cmd"
+	"github.com/ljcbaby/domainlist-convert/log"
 )
 
 func main() {

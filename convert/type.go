@@ -1,6 +1,6 @@
 package convert
 
-import "github.com/dn-11/provider2domainset/conf"
+import "github.com/ljcbaby/domainlist-convert/conf"
 
 type Task struct {
 	conf.File

@@ -6,7 +6,6 @@ on:
       - 'v*'
 
 jobs:
-
   build-release:
     runs-on: ubuntu-latest
     steps:
@@ -36,3 +35,4 @@ jobs:
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          

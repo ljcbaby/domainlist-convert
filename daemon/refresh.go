@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dn-11/provider2domainset/log"
+	"github.com/ljcbaby/domainlist-convert/log"
 )
 
 var (
