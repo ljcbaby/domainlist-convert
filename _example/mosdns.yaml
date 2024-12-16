@@ -1,0 +1,258 @@
+# mosdns 配置文件示例, 注意配合 luci-app-mosdns 使用
+# 有些文件名不一样是因为 luci-app-mosdns 硬编码了这些文件，复用可以方便在 luci 上直接编辑
+# 结合自己情况调整，直接复制不是好文明，建议先看一遍理解一下，补上需要本地化的。
+
+log:
+  level: info
+  file: "/tmp/mosdns.log"
+  
+# api:
+#   http: "127.0.0.1:8080" # 在该地址启动 api 接口。
+  
+plugins:
+  # 白名单 加入的域名始终允许使用 “本地 DNS” 进行解析
+  - tag: whitelist
+    type: domain_set
+    args:
+      files:
+        - "/etc/mosdns/from_provider/icloud.yaml"
+        - "/etc/mosdns/from_provider/apple.yaml"
+        - "/etc/mosdns/from_provider/direct.yaml"
+
+  # 黑名单 加入的域名将通过clash分流
+  - tag: proxylist
+    type: domain_set
+    args:
+      files:
+        - "/etc/mosdns/from_provider/ai.txt"
+        - "/etc/mosdns/from_provider/gfw.yaml"
+        - "/etc/mosdns/from_provider/proxy.yaml"
+
+  # 强制黑名单 加入的域名将通过clash分流
+  - tag: proxylist_force
+    type: domain_set
+    args:
+      files:
+        - "/etc/mosdns/rule/blocklist.txt"
+
+  # 强制白名单 加入的域名将通过clash分流
+  - tag: whitelist_force
+    type: domain_set
+    args:
+      files:
+        - "/etc/mosdns/rule/whitelist.txt"
+
+  # 双栈白名单
+  - tag: duallist
+    type: domain_set
+    args:
+      files:
+        - "/etc/mosdns/rule/greylist.txt"
+
+  # IP 黑名单
+  - tag: dropiplist
+    type: ip_set
+    args:
+      files:
+        - "/etc/mosdns/rule/ddnslist.txt"
+
+  # 自定义 Hosts 重写
+  - tag: hosts
+    type: hosts
+    args:
+      files:
+        - "/etc/mosdns/rule/hosts.txt"
+
+  # 重定向请求的域名
+  - tag: redirect
+    type: redirect
+    args:
+      files:
+        - "/etc/mosdns/rule/redirect.txt"
+
+  # 缓存
+  - tag: cache
+    type: cache
+    args:
+      size: 102400
+      lazy_cache_ttl: 0
+      dump_file: "/etc/mosdns/rule/cache.dump"
+      dump_interval: 3600
+
+  # 有响应终止返回
+  - tag: has_resp_sequence
+    type: sequence
+    args:
+      - matches: has_resp
+        exec: accept
+
+  # 转发至本地服务器
+  - tag: forward_local
+    type: forward
+    args:
+      concurrent: 2
+      upstreams:
+        # - addr: ldns1
+        # - addr: ldns2
+  
+  # 转发至本地服务器
+  - tag: forward_cn
+    type: forward
+    args:
+      concurrent: 3
+      upstreams:
+        - addr: ldns1
+        - addr: 223.5.5.5
+        - addr: 119.29.29.29
+        - addr: ldns2
+        - addr: 223.6.6.6
+        - addr: 119.28.28.28
+        - addr: tcp://ldns1
+          enable_pipeline: true
+        - addr: tcp://223.5.5.5
+        - addr: tls://dot.pub
+          enable_pipeline: true
+          bootstrap: "119.29.29.29"
+        - addr: tcp://ldns2
+          enable_pipeline: true
+        - addr: tcp://223.6.6.6
+  
+  # 转发至远程服务器
+  - tag: forward_remote
+    type: forward
+    args:
+      upstreams:
+        - addr: tls://8.8.8.8:853
+          enable_pipeline: true
+        - addr: tls://1.1.1.1:853
+          enable_pipeline: true
+
+  # 转发至clash
+  - tag: clash_remote
+    type: forward
+    args:
+      upstreams:
+        - addr: 127.0.0.1:7874
+
+  # 本地解析
+  - tag: local_sequence
+    type: sequence
+    args:
+      - exec: $cache
+      - exec: jump has_resp_sequence
+      - exec: $forward_local
+
+  # 国内解析
+  - tag: cn_sequence
+    type: sequence
+    args:
+      - exec: $cache
+      - exec: jump has_resp_sequence
+      - matches: "!qname $duallist"
+        exec: prefer_ipv4
+      - exec: $forward_cn
+
+  # 国外解析
+  - tag: remote_sequence
+    type: sequence
+    args:
+      - exec: $forward_remote
+
+  # clash解析
+  - tag: fakeip_sequence
+    type: sequence
+    args:
+      - exec: $clash_remote
+      - exec: ttl 300-0
+
+  # 查询chnlist
+  - tag: query_is_whitelist_domain
+    type: sequence
+    args:
+      - matches: qname $whitelist
+        exec: $cn_sequence
+
+  # 查询proxylist
+  - tag: query_is_proxy_domain
+    type: sequence
+    args:
+      - matches: qname $proxylist
+        exec: $fakeip_sequence
+
+  # 查询proxylist_force
+  - tag: query_is_white_domain_force
+    type: sequence
+    args:
+      - matches: qname $whitelist_force
+        exec: $cn_sequence
+
+  # 查询proxylist_force
+  - tag: query_is_proxy_domain_force
+    type: sequence
+    args:
+      - matches: qname $proxylist_force
+        exec: $fakeip_sequence
+
+  # 查询未知域名
+  - tag: query_is_unknown_domain
+    type: sequence
+    args:
+      - exec: $cn_sequence
+      - matches: resp_ip $dropiplist
+        exec: drop_resp
+      - exec: jump has_resp_sequence
+      - exec: $fakeip_sequence
+
+  # 查询非A和AAAA记录
+  - tag: query_is_not_aaaa_a
+    type: sequence
+    args:
+      - matches: "!qclass 1 28"
+        exec: $local_sequence
+
+  # 阻止Https类型
+  - tag: query_is_https
+    type: sequence
+    args:
+      - matches: qclass 65
+        exec: reject 0
+
+  # 主要的运行逻辑插件
+  # sequence 插件中调用的插件 tag 必须在 sequence 前定义，
+  # 否则 sequence 找不到对应插件。
+  - tag: main_sequence
+    type: sequence
+    args:
+      - exec: $query_is_https
+      - exec: jump has_resp_sequence
+      - exec: $query_is_not_aaaa_a
+      - exec: jump has_resp_sequence
+      - exec: $hosts
+      - exec: jump has_resp_sequence
+      - exec: $redirect
+      - exec: jump has_resp_sequence
+      - exec: $query_is_white_domain_force
+      - exec: jump has_resp_sequence
+      - exec: $query_is_proxy_domain_force
+      - exec: jump has_resp_sequence
+      - exec: $query_is_whitelist_domain
+      - exec: jump has_resp_sequence
+      - exec: $query_is_proxy_domain
+      - exec: jump has_resp_sequence
+      - exec: $query_is_unknown_domain
+      - exec: jump has_resp_sequence
+      - exec: $remote_sequence
+
+  # 启动 udp 服务器。
+  - tag: udp_server
+    type: udp_server
+    args:
+      entry: main_sequence
+      listen: "127.0.0.1:5353"
+  # 启动 tcp 服务器。
+  - tag: tcp_server
+    type: tcp_server
+    args:
+      entry: main_sequence
+      listen: "127.0.0.1:5353"
+      idle_timeout: 3600

@@ -1,0 +1,146 @@
+# clash 配置文件示例, 注意配合 luci-app-openclash 使用
+# 结合自己情况调整，直接复制不是好文明，建议先看一遍理解一下，补上需要的。
+
+ipv6: true
+
+proxies:
+  - name: "example"
+    type: vmess
+    server: "example.com"
+    port: 443
+    uuid: "00000000-0000-0000-0000-000000000000"
+    alterId: 0
+    cipher: auto
+    tls: true
+    servername: example.com
+    network: ws
+    ws-path: "/example"
+    ws-headers:
+    Host: example.com
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - example
+      - main
+      - backup
+      - DIRECT
+  - name: AIGC
+    type: select
+    use:
+      - main
+  - name: main
+    type: select
+    use:
+      - main
+  - name: backup
+    type: select
+    use:
+      - backup
+  - name: Unmached
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+
+proxy-providers:
+  main:
+    type: http
+    url: example.com
+    interval: 3600
+    path: ./profiles/main.yaml
+    health-check:
+      enable: false
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+  backup:
+    type: http
+    url: example.com
+    interval: 3600
+    path: ./profiles/backup.yaml
+    health-check:
+      enable: false
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    path: ./ruleset/reject.yaml
+    interval: 86400
+  icloud:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+  apple:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
+    path: ./ruleset/apple.yaml
+    interval: 86400
+  direct:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./ruleset/direct.yaml
+    interval: 86400
+  proxy:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+  gfw:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+  ai:
+    type: http
+    behavior: classical
+    format: text
+    interval: 43200
+    url: https://ruleset.skk.moe/Clash/non_ip/ai.txt
+    path: ./ruleset/ai.txt
+
+rules:
+  - DOMAIN,clash.razord.top,DIRECT
+  - DOMAIN,yacd.haishan.me,DIRECT
+  - RULE-SET,reject,REJECT
+  - RULE-SET,ai,AIGC
+  - IP-CIDR,8.8.8.8/32,PROXY
+  - IP-CIDR,1.1.1.1/32,PROXY
+  - IP-CIDR,8.8.4.4/32,PROXY
+  - IP-CIDR,1.0.0.1/32,PROXY
+  - IP-CIDR,192.168.3.2/32,DIRECT
+  - DOMAIN,cdn.jsdelivr.net,PROXY
+  - DOMAIN,assets.fanart.tv,PROXY
+  - RULE-SET,telegramcidr,PROXY
+  - RULE-SET,icloud,DIRECT
+  - RULE-SET,apple,DIRECT
+  - RULE-SET,gfw,PROXY
+  - RULE-SET,direct,DIRECT
+  - RULE-SET,proxy,PROXY
+  - GEOIP,CN,DIRECT
+  - MATCH,Unmached
+
+dns:
+  nameserver:
+  - gwdns
+  fallback:
+  - https://8.8.8.8/dns-query
+  - https://1.1.1.1/dns-query
+  proxy-server-nameserver:
+  - gwdns
