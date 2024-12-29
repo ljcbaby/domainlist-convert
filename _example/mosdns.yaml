@@ -207,14 +207,14 @@ plugins:
   - tag: query_is_not_aaaa_a
     type: sequence
     args:
-      - matches: "!qclass 1 28"
+      - matches: "!qtype 1 28"
         exec: $local_sequence
 
   # 阻止Https类型
   - tag: query_is_https
     type: sequence
     args:
-      - matches: qclass 65
+      - matches: qtype 65
         exec: reject 0
 
   # 主要的运行逻辑插件
