@@ -23,21 +23,45 @@ proxy-groups:
     type: select
     proxies:
       - example
+      - filtered
       - main
       - backup
       - DIRECT
+    url: https://www.gstatic.com/generate_204
+    interval: 600
+    timeout: 2000
+    lazy: true
   - name: AIGC
     type: select
     use:
       - main
+  - name: filtered
+    type: url-test
+    tolerance: 200
+    use:
+      - main
+    filter: "hk|hongkong|hong kong"
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    timeout: 2000
+    max-failed-times: 5
+    lazy: true
   - name: main
     type: select
     use:
       - main
+    url: https://www.gstatic.com/generate_204
+    interval: 0
+    timeout: 2000
+    lazy: true
   - name: backup
     type: select
     use:
       - backup
+    url: https://www.gstatic.com/generate_204
+    interval: 0
+    timeout: 2000
+    lazy: true
   - name: Unmached
     type: select
     proxies:
@@ -50,19 +74,11 @@ proxy-providers:
     url: example.com
     interval: 3600
     path: ./profiles/main.yaml
-    health-check:
-      enable: false
-      url: http://www.gstatic.com/generate_204
-      interval: 300
   backup:
     type: http
     url: example.com
     interval: 3600
     path: ./profiles/backup.yaml
-    health-check:
-      enable: false
-      url: http://www.gstatic.com/generate_204
-      interval: 300
 
 rule-providers:
   reject:
@@ -116,17 +132,12 @@ rule-providers:
     path: ./ruleset/ai.txt
 
 rules:
-  - DOMAIN,clash.razord.top,DIRECT
-  - DOMAIN,yacd.haishan.me,DIRECT
   - RULE-SET,reject,REJECT
   - RULE-SET,ai,AIGC
   - IP-CIDR,8.8.8.8/32,PROXY
   - IP-CIDR,1.1.1.1/32,PROXY
   - IP-CIDR,8.8.4.4/32,PROXY
   - IP-CIDR,1.0.0.1/32,PROXY
-  - IP-CIDR,192.168.3.2/32,DIRECT
-  - DOMAIN,cdn.jsdelivr.net,PROXY
-  - DOMAIN,assets.fanart.tv,PROXY
   - RULE-SET,telegramcidr,PROXY
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
@@ -138,9 +149,9 @@ rules:
 
 dns:
   nameserver:
-  - gwdns
+  - gwdns # change it
   fallback:
   - https://8.8.8.8/dns-query
   - https://1.1.1.1/dns-query
   proxy-server-nameserver:
-  - gwdns
+  - gwdns # change it
