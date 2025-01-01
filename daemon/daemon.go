@@ -62,17 +62,7 @@ func watch(watcher *fsnotify.Watcher) {
 						lastEvent[f.Name] = now
 						sLock.Unlock()
 
-						log.L().Sugar().Infof("File %s modified", f.Name)
-						err := convert.Convert(convert.Task{
-							Source: conf.Convert.Source,
-							Target: conf.Convert.Target,
-							File:   f,
-						})
-						if err != nil {
-							log.L().Sugar().Errorf("Convert %s error: %v", f.Name, err)
-						}
-
-						refreshChan <- struct{}{}
+						go updateFile(f)
 					}
 				}
 			}
@@ -84,4 +74,20 @@ func watch(watcher *fsnotify.Watcher) {
 			log.L().Sugar().Errorf("Watcher error: %v", err)
 		}
 	}
+}
+
+func updateFile(f conf.File) {
+	time.Sleep(time.Second)
+
+	log.L().Sugar().Infof("File %s modified", f.Name)
+	err := convert.Convert(convert.Task{
+		Source: conf.Convert.Source,
+		Target: conf.Convert.Target,
+		File:   f,
+	})
+	if err != nil {
+		log.L().Sugar().Errorf("Convert %s error: %v", f.Name, err)
+	}
+
+	refreshChan <- struct{}{}
 }
