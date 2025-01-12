@@ -70,14 +70,14 @@ plugins:
       files:
         - "/etc/mosdns/rule/redirect.txt"
 
-  # 缓存
-  - tag: cache
-    type: cache
-    args:
-      size: 102400
-      lazy_cache_ttl: 0
-      dump_file: "/etc/mosdns/rule/cache.dump"
-      dump_interval: 3600
+  # # 缓存
+  # - tag: cache
+  #   type: cache
+  #   args:
+  #     size: 102400
+  #     lazy_cache_ttl: 0
+  #     dump_file: "/etc/mosdns/rule/cache.dump"
+  #     dump_interval: 3600
 
   # 有响应终止返回
   - tag: has_resp_sequence
@@ -138,7 +138,7 @@ plugins:
   - tag: local_sequence
     type: sequence
     args:
-      - exec: $cache
+      # - exec: $cache
       - exec: jump has_resp_sequence
       - exec: $forward_local
 
@@ -146,7 +146,7 @@ plugins:
   - tag: cn_sequence
     type: sequence
     args:
-      - exec: $cache
+      # - exec: $cache
       - exec: jump has_resp_sequence
       - matches: "!qname $duallist"
         exec: prefer_ipv4
